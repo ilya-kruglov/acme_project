@@ -9,8 +9,13 @@
     <input type="submit" value="Submit">
   </form>
   {% with data=request.GET %}
-    {% if data %}
+    {% if form.is_valid %}
       <h2>Привет, {{ data.first_name }} {{ data.last_name }}</h2>
+      {% if birthday_countdown == 0 %}
+        С днём рождения!
+      {% else %}
+        Осталось дней до дня рождения: {{ birthday_countdown }}!
+      {% endif %}
     {% endif %}
   {% endwith %}
 {% endblock %}
