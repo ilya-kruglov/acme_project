@@ -1,7 +1,7 @@
 # birthday/views.py
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import CreateView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from django.urls import reverse_lazy
 
 from .forms import BirthdayForm
@@ -57,25 +57,23 @@ class BirthdayListView(ListView):
     paginate_by = 3
 
 
-class BirthdayCreateView(CreateView):
-    # Указываем модель, с которой работает CBV...
+class BirthdayMixin:
     model = Birthday
-    # Этот класс сам может создать форму на основе модели!
-    # Нет необходимости отдельно создавать форму через ModelForm.
-    # # Указываем поля, которые должны быть в форме:
-    # fields = '__all__'
-    # или, если хотим использовать собственную форму,
-    # юзаем форм_класс и указываем имя формы:
-    form_class = BirthdayForm
-    # Явным образом указываем шаблон:
-    template_name = 'birthday/birthday.html'
-    # Указываем namespace:name страницы, куда будет перенаправлен пользователь
-    # после создания объекта:
     success_url = reverse_lazy('birthday:list')
 
 
-class BirthdayUpdateView(UpdateView):
-    model = Birthday
+class BirthdayFormMixin:
     form_class = BirthdayForm
     template_name = 'birthday/birthday.html'
-    success_url = reverse_lazy('birthday:list')
+
+
+class BirthdayCreateView(BirthdayMixin, BirthdayFormMixin, CreateView):
+    pass
+
+
+class BirthdayUpdateView(BirthdayMixin, BirthdayFormMixin, UpdateView):
+    pass
+
+
+class BirthdayDeleteView(BirthdayMixin, DeleteView):
+    pass
