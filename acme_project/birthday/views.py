@@ -19,26 +19,19 @@ class BirthdayListView(ListView):
     paginate_by = 3
 
 
-class BirthdayMixin:
+class BirthdayCreateView(CreateView):
+    model = Birthday
+    form_class = BirthdayForm
+
+
+class BirthdayUpdateView(UpdateView):
+    model = Birthday
+    form_class = BirthdayForm
+
+
+class BirthdayDeleteView(DeleteView):
     model = Birthday
     success_url = reverse_lazy('birthday:list')
-
-
-class BirthdayFormMixin:
-    form_class = BirthdayForm
-    template_name = 'birthday/birthday.html'
-
-
-class BirthdayCreateView(BirthdayMixin, BirthdayFormMixin, CreateView):
-    pass
-
-
-class BirthdayUpdateView(BirthdayMixin, BirthdayFormMixin, UpdateView):
-    pass
-
-
-class BirthdayDeleteView(BirthdayMixin, DeleteView):
-    pass
 
 
 class BirthdayDetailView(DetailView):
