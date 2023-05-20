@@ -2,6 +2,7 @@
 from typing import Any, Dict
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms.models import BaseModelForm
 from django.http import HttpResponse
 from django.views.generic import (
     CreateView, DeleteView, DetailView, ListView, UpdateView
@@ -30,6 +31,12 @@ class BirthdayListView(ListView):
 class BirthdayCreateView(LoginRequiredMixin, CreateView):
     model = Birthday
     form_class = BirthdayForm
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        # Присвоить полю author объект пользователя из запроса.
+        form.instance.author = self.request.user
+        # Продолжить валидацию, описанную в форме.
+        return super().form_valid(form)
 
 
 class BirthdayUpdateView(LoginRequiredMixin, UpdateView):
