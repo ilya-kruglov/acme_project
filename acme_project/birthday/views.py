@@ -3,7 +3,8 @@ from typing import Any, Dict
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.models import BaseModelForm
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse, Http404
+from django.shortcuts import get_object_or_404
 from django.views.generic import (
     CreateView, DeleteView, DetailView, ListView, UpdateView
 )
@@ -43,10 +44,33 @@ class BirthdayUpdateView(LoginRequiredMixin, UpdateView):
     model = Birthday
     form_class = BirthdayForm
 
+    def dispatch(
+            self, request: HttpRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponse:
+        # При получении объекта не указываем автора.
+        # Результат сохраняем в переменную.
+        instance = get_object_or_404(Birthday, pk=kwargs['pk'])
+        if not request.user.is_superuser:
+            # Сверяем автора объекта и пользователя из запроса.
+            if instance.author != request.user:
+                # Здесь может быть как вызов ошибки,
+                # так и редирект на нужную страницу.
+                raise Http404
+        return super().dispatch(request, *args, **kwargs)
+
 
 class BirthdayDeleteView(LoginRequiredMixin, DeleteView):
     model = Birthday
     success_url = reverse_lazy('birthday:list')
+
+    def dispatch(
+            self, request: HttpRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponse:
+        instance = get_object_or_404(Birthday, pk=kwargs['pk'])
+        if not request.user.is_superuser:
+            if instance.author != request.user:
+                raise Http404
+        return super().dispatch(request, *args, **kwargs)
 
 
 class BirthdayDetailView(DetailView):
