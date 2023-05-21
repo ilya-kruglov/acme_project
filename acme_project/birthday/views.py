@@ -23,10 +23,14 @@ def simple_view(request):
 class BirthdayListView(ListView):
     # Указываем модель, с которой работает CBV...
     model = Birthday
-    # ...сортировку, которая будет применена при выводе списка объектов:
+    # По умолчанию этот класс
+    # выполняет запрос queryset = Birthday.objects.all(),
+    # но мы его переопределим:
+    queryset = Birthday.objects.prefetch_related(
+        'tags'
+    ).select_related('author')
     ordering = 'id'
-    # ...и даже настройки пагинации:
-    paginate_by = 3
+    paginate_by = 10
 
 
 class BirthdayCreateView(LoginRequiredMixin, CreateView):
